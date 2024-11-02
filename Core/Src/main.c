@@ -29,8 +29,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
-#include "stm32f429i_discovery_lcd.h"
+#include "lcd_menu.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -57,6 +56,9 @@
 
 char msg[64]; // debug usart1 message frame
 uint32_t count; // encoder counter
+uint8_t menu_choice = 0;
+enum Main_menu_type actual_menu_type = MAIN;
+
 
 /* USER CODE END PV */
 
@@ -113,12 +115,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  BSP_LCD_Init();
-  BSP_LCD_LayerDefaultInit(LCD_BACKGROUND_LAYER, LCD_FRAME_BUFFER);
-  BSP_LCD_Clear(LCD_COLOR_CYAN);
-  BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"Hello world!");
+  lcd_initialization();
 
   HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+  HAL_Delay(1000);
+  // lcd_main_menu(actual_menu_type);
 
   while (1)
   {
@@ -128,13 +129,20 @@ int main(void)
     sprintf((char*)msg, "Odczyt: %d\n\r", count);
     HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 1000);
 
+    // I have created definition of main memu function
+    // next I should create other menues and set interrupt for another button
+    // this button enables enter other menues
+    // check pin debouncing, small problem with choice menu (propably debouncing)
 
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-    HAL_Delay(100);
+
+
+
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
+    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -198,6 +206,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if (GPIO_Pin == encoder_button_Pin)
   {
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+    
+    if (actual_menu_type == MAIN)
+    {
+      if (menu_choice > 2)
+        menu_choice = 0;
+      else 
+        menu_choice++;
+    }
+
+    lcd_refresh_UJ(actual_menu_type, menu_choice);
   }
 }
 
