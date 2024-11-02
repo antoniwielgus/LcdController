@@ -1086,6 +1086,21 @@
           <name>$PROJ_DIR$/../Core/Src/gpio.c</name>
         </file>
         <file>
+          <name>$PROJ_DIR$/../Core/Src/dma2d.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/fmc.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/i2c.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/ltdc.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/spi.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$/../Core/Src/stm32f4xx_it.c</name>
         </file>
         <file>
@@ -1099,10 +1114,7 @@
     <group>
       <name>STM32F4xx_HAL_Driver</name>
       <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c</name>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma2d.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c</name>
@@ -1142,6 +1154,36 @@
       </file>
       <file>
         <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_fmc.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_sdram.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc_ex.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dsi.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c</name>
       </file>
     </group>
     <group>
