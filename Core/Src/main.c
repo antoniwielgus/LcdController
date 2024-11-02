@@ -22,6 +22,8 @@
 #include "i2c.h"
 #include "ltdc.h"
 #include "spi.h"
+#include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -29,6 +31,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "stm32f429i_discovery_lcd.h"
+#include <stdio.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -50,6 +54,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+char msg[64]; // debug usart1 message frame
+uint32_t count; // encoder counter
 
 /* USER CODE END PV */
 
@@ -98,6 +105,8 @@ int main(void)
   MX_I2C3_Init();
   MX_LTDC_Init();
   MX_SPI5_Init();
+  MX_USART1_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -109,10 +118,18 @@ int main(void)
   BSP_LCD_Clear(LCD_COLOR_CYAN);
   BSP_LCD_DisplayStringAtLine(0, (uint8_t*)"Hello world!");
 
+  HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+
   while (1)
   {
+    count = __HAL_TIM_GET_COUNTER(&htim3);
+    count /= 2;
+
+    sprintf((char*)msg, "Odczyt: %d\n\r", count);
+    HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 1000);
+
+
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
     HAL_Delay(100);
 
     /* USER CODE END WHILE */
@@ -175,6 +192,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == encoder_button_Pin)
+  {
+    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
+  }
+}
 
 /* USER CODE END 4 */
 

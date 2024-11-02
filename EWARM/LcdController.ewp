@@ -1101,6 +1101,12 @@
           <name>$PROJ_DIR$/../Core/Src/spi.c</name>
         </file>
         <file>
+          <name>$PROJ_DIR$/../Core/Src/tim.c</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$/../Core/Src/usart.c</name>
+        </file>
+        <file>
           <name>$PROJ_DIR$/../Core/Src/stm32f4xx_it.c</name>
         </file>
         <file>
@@ -1184,6 +1190,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c</name>
       </file>
     </group>
     <group>
