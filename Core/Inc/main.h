@@ -57,11 +57,24 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define encoder_interrupt_Pin GPIO_PIN_6
+#define encoder_interrupt_GPIO_Port GPIOF
+#define encoder_interrupt_EXTI_IRQn EXTI9_5_IRQn
+#define confirm_button_Pin GPIO_PIN_0
+#define confirm_button_GPIO_Port GPIOA
+#define confirm_button_EXTI_IRQn EXTI0_IRQn
 #define encoder_button_Pin GPIO_PIN_5
 #define encoder_button_GPIO_Port GPIOA
 #define encoder_button_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
+
+// global variables
+extern float p;
+extern float v;
+extern float kp;
+extern float kd;
+extern float t;
 
 /* USER CODE END Private defines */
 

@@ -9,7 +9,12 @@
 #define LCD_MENU_H
 
 #include "main.h"
+#include "stdio.h"
+#include "string.h"
 
+
+// const uint8_t buffer_size = 64;
+// char message[buffer_size];
 
 enum Main_menu_type
 {
@@ -26,6 +31,8 @@ void lcd_main_menu(uint8_t choice);
 void lcd_parameters_type(uint8_t choice);
 void lcd_movment_type(uint8_t choice);
 void lcd_sensors_type(uint8_t choice);
+
+void float_to_char_array(char* destination, float value);
 
 
 
