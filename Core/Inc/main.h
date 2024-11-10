@@ -70,11 +70,11 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 
 // global variables
-extern float p;
-extern float v;
-extern float kp;
-extern float kd;
-extern float t;
+extern uint16_t p;
+extern uint16_t v;
+extern uint16_t kp;
+extern uint16_t kd;
+extern uint16_t t;
 
 /* USER CODE END Private defines */
 

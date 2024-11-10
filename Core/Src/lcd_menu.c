@@ -133,7 +133,7 @@ void lcd_parameters_type(uint8_t choice)
     }
 
     char message[64];
-    char float_char[5];
+    char float_char[6];
 
     BSP_LCD_SetTextColor(color0);
     float_to_char_array(float_char, p);
@@ -173,25 +173,18 @@ void lcd_parameters_type(uint8_t choice)
     BSP_LCD_DisplayStringAtLine(9, (uint8_t *)"BACK");
 }
 
-void float_to_char_array(char *destination, float value)
+void float_to_char_array(char *destination, uint16_t value)
 {
-    uint16_t value_uint = value * 100;
-    char val[5];
+    char val[6];
 
-    sprintf(val, "%d", value_uint);
+    sprintf(val, "%d", value);
 
-    if (value == 0.0)
-    {
-        sprintf(destination, "%c%c%c%c", val[0], val[1], val[2], val[3]);
-        return;
-    }     
-
-    if ((uint8_t)value == 0)
-        sprintf(destination, "0,%c%c%c", val[0], val[1], val[2]);
-    else if ((uint8_t)value < 10)
-        sprintf(destination, "%c,%c%c%c", val[0], val[1], val[2], val[3]);
-    else if ((uint8_t)value < 100)
-        sprintf(destination, "%c%c,%c%c", val[0], val[1], val[2], val[3]);
-    else if ((uint8_t)value < 1000)
-        sprintf(destination, "%c%c%c,%c", val[0], val[1], val[2], val[3]);
+    if (value < 100)
+        sprintf(destination, "0,%c%c%c%c%c", val[0], val[1], val[2], val[3], val[4]);
+    else if (value < 1000)
+        sprintf(destination, "%c,%c%c%c%c", val[0], val[1], val[2], val[3], val[4]);
+    else if (value < 10000)
+        sprintf(destination, "%c%c,%c%c%c", val[0], val[1], val[2], val[3], val[4]);
+    else if (value < 100000)
+        sprintf(destination, "%c%c%c,%c%c", val[0], val[1], val[2], val[3], val[4]);
 }

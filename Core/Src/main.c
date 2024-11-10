@@ -61,17 +61,19 @@ enum Main_menu_type actual_menu_type = MAIN;
 // enum Main_menu_type cursor_menu_type = MAIN;
 
 // parameters
-float p = 0.0;
-float v = 0.0;
-float kp = 0.0;
-float kd = 0.0;
-float t = 0.0;
+uint16_t p = 0;
+uint16_t v = 0;
+uint16_t kp = 0;
+uint16_t kd = 0;
+uint16_t t = 0;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
+uint16_t abs(uint16_t num);
 
 /* USER CODE END PFP */
 
@@ -133,7 +135,7 @@ int main(void)
     count = __HAL_TIM_GET_COUNTER(&htim3);
     count /= 2;
 
-    sprintf((char *)msg, "Odczyt: %d\n\r", count);
+    sprintf((char *)msg, "Encoder: %d, P: %d, V: %d\n\r", count, p, v);
     HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 1000);
 
 
@@ -202,7 +204,7 @@ void SystemClock_Config(void)
 uint32_t previousTime = 0;
 uint32_t currentTime = 0;
 
-uint8_t encoder_previous = 0;
+uint8_t encoder_previous_count = 0;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -229,8 +231,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       else
         menu_choice++;
     }
-
-    // lcd_refresh_UJ(actual_menu_type, menu_choice);
   }
 
   if (GPIO_Pin == confirm_button_Pin && (currentTime - previousTime > 100))
@@ -248,38 +248,42 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       actual_menu_type = MAIN;
       menu_choice = 0;
     }
-    // lcd_refresh_UJ(actual_menu_type, menu_choice);
+
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
   }
 
-  if (GPIO_Pin == encoder_interrupt_Pin && (currentTime - previousTime > 10))
+  if (GPIO_Pin == encoder_interrupt_Pin && (currentTime - previousTime > 5))
   {
     previousTime = currentTime;
 
     // for P value
     if (actual_menu_type == PARAMETERS && menu_choice == 0)
     {
-      // right
-      if (count > encoder_previous)
-        p += 0.1;
-      else // left
-        p -= 0.1;
+      p += 10 * (count - encoder_previous_count);
     }
 
-    // for P value
-    if (actual_menu_type == PARAMETERS && menu_choice == 0)
+    // for V value
+    if (actual_menu_type == PARAMETERS && menu_choice == 1)
     {
-      // right
-      if (count > encoder_previous)
-        p += 0.1;
-      else // left
-        p -= 0.1;
+      v += 10 * (count - encoder_previous_count);
     }
 
-    encoder_previous = count;
+    encoder_previous_count = count;
   }
 
   lcd_refresh_UJ(actual_menu_type, menu_choice);
+}
+
+
+
+
+
+uint16_t abs(uint16_t num)
+{
+  if (num < 0)
+    return (-1 * num);
+  else
+    return num;
 }
 
 /* USER CODE END 4 */
