@@ -157,7 +157,7 @@ void lcd_parameters_type(uint8_t choice)
 
     BSP_LCD_SetTextColor(color4);
     float_to_char_array(float_char, t);
-    sprintf(message, "V: %s", float_char);
+    sprintf(message, "T: %s", float_char);
     BSP_LCD_DisplayStringAtLine(5, message);
 
     BSP_LCD_SetTextColor(color5);

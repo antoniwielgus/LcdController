@@ -53,12 +53,12 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t encoder_previous_count = 0;
 
 char msg[64];   // debug usart1 message frame
 uint32_t count; // encoder counter
 uint8_t menu_choice = 0;
 enum Main_menu_type actual_menu_type = MAIN;
-// enum Main_menu_type cursor_menu_type = MAIN;
 
 // parameters
 uint16_t p = 0;
@@ -67,25 +67,33 @@ uint16_t kp = 0;
 uint16_t kd = 0;
 uint16_t t = 0;
 
+// parameters constraints
+const uint16_t P_MAX = 1250;
+const uint16_t P_MIN = 0;
+
+const uint16_t V_MAX = 950;
+const uint16_t V_MIN = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-uint16_t abs(uint16_t num);
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// this function is used to refresh p, v, Kp, Kd, t parameters
+void refresh_parameters();
+
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
 
@@ -135,37 +143,35 @@ int main(void)
     count = __HAL_TIM_GET_COUNTER(&htim3);
     count /= 2;
 
-    sprintf((char *)msg, "Encoder: %d, P: %d, V: %d\n\r", count, p, v);
-    HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 1000);
+    refresh_parameters();
 
-
-
+    // sprintf((char *)msg, "Encoder: %d, P: %d, V: %d\n\r", count, p, v);
+    // HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_14);
-    HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
+  * in the RCC_OscInitTypeDef structure.
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -180,15 +186,16 @@ void SystemClock_Config(void)
   }
 
   /** Activate the Over-Drive mode
-   */
+  */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -203,8 +210,6 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 uint32_t previousTime = 0;
 uint32_t currentTime = 0;
-
-uint8_t encoder_previous_count = 0;
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -252,46 +257,75 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
   }
 
-  if (GPIO_Pin == encoder_interrupt_Pin && (currentTime - previousTime > 5))
+  if (GPIO_Pin == encoder_interrupt_Pin)
   {
-    previousTime = currentTime;
-
-    // for P value
-    if (actual_menu_type == PARAMETERS && menu_choice == 0)
-    {
-      p += 10 * (count - encoder_previous_count);
-    }
-
-    // for V value
-    if (actual_menu_type == PARAMETERS && menu_choice == 1)
-    {
-      v += 10 * (count - encoder_previous_count);
-    }
-
-    encoder_previous_count = count;
+    // useful to debug
+    // sprintf((char *)msg, "Encoder: %d, Different: %d, P: %d, V: %d, flag: %d\n\r", count, counter_different, p, v, addition_flag);
+    // HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 1000);
   }
 
   lcd_refresh_UJ(actual_menu_type, menu_choice);
 }
 
-
-
-
-
-uint16_t abs(uint16_t num)
+void refresh_parameters()
 {
-  if (num < 0)
-    return (-1 * num);
-  else
-    return num;
+  int8_t counter_different = count - encoder_previous_count;
+
+  if (counter_different == 999 || counter_different == -999)
+    counter_different = 1;
+
+  int8_t addition_flag = 1;
+  if (counter_different < 0)
+  {
+    addition_flag = -1;
+    counter_different *= -1;
+  }
+
+  // for P value
+  if (actual_menu_type == PARAMETERS && menu_choice == 0)
+  {
+    p += (10 * counter_different * addition_flag);
+
+    if (p > P_MAX)
+      p = P_MAX;
+  }
+
+  // for V value
+  if (actual_menu_type == PARAMETERS && menu_choice == 1)
+  {
+    v += (10 * counter_different * addition_flag);
+
+    if (v > V_MAX)
+      v = V_MAX;
+  }
+
+  // for Kp value
+  if (actual_menu_type == PARAMETERS && menu_choice == 2)
+  {
+    kp += (10 * counter_different * addition_flag);
+  }
+
+  // for KD value
+  if (actual_menu_type == PARAMETERS && menu_choice == 3)
+  {
+    kd += (10 * counter_different * addition_flag);
+  }
+
+  // for t value
+  if (actual_menu_type == PARAMETERS && menu_choice == 4)
+  {
+    t += (10 * counter_different * addition_flag);
+  }
+
+  encoder_previous_count = count;
 }
 
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -303,14 +337,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
