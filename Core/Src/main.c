@@ -30,6 +30,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd_menu.h"
+#include "communication.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -126,6 +128,7 @@ int main(void)
   MX_SPI5_Init();
   MX_USART1_UART_Init();
   MX_TIM3_Init();
+  MX_UART5_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -252,6 +255,22 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
       actual_menu_type = MAIN;
       menu_choice = 0;
+    }
+
+    // start motor
+    if (actual_menu_type == PARAMETERS && menu_choice == 5)
+    { 
+      set_can_ID(2);
+      start_engin();
+      send_buffer(&huart5);
+    }
+
+    // stop motor
+    if (actual_menu_type == PARAMETERS && menu_choice == 6)
+    {
+      set_can_ID(2);
+      stop_engin();
+      send_buffer(&huart5);
     }
 
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);

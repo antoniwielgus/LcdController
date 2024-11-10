@@ -13,7 +13,7 @@ void lcd_initialization()
     BSP_LCD_Init();
     BSP_LCD_LayerDefaultInit(LCD_BACKGROUND_LAYER, LCD_FRAME_BUFFER);
     BSP_LCD_Clear(LCD_COLOR_CYAN);
-    BSP_LCD_DisplayStringAtLine(0, (uint8_t *)"Hello world2!");
+    BSP_LCD_DisplayStringAtLine(0, (uint8_t *)"Lcd_controller");
 }
 
 void lcd_refresh_UJ(enum Main_menu_type actual, uint8_t choice)
