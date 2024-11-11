@@ -37,6 +37,9 @@ void load_data()
 {
     union Float_to_uint8_array my_union;
 
+    // motor is already running
+    sender_buffer[1] = 0x02;
+
     uint8_t i = 2;
 
     my_union.float_value = p/100.;

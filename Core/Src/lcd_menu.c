@@ -45,6 +45,9 @@ void lcd_main_menu(uint8_t choice)
 {
     BSP_LCD_Clear(LCD_COLOR_WHITE);
 
+    char msg[12];
+    sprintf(msg, "CAN ID: %d", can_id);
+
     switch (choice)
     {
     case 0: // parameters
@@ -54,6 +57,8 @@ void lcd_main_menu(uint8_t choice)
         BSP_LCD_DisplayStringAtLine(1, (uint8_t *)"MOVEMENT");
         BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
         BSP_LCD_DisplayStringAtLine(2, (uint8_t *)"SENSORS");
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(3, msg);
         break;
     case 1: // movement
         BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
@@ -62,6 +67,8 @@ void lcd_main_menu(uint8_t choice)
         BSP_LCD_DisplayStringAtLine(1, (uint8_t *)"MOVEMENT");
         BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
         BSP_LCD_DisplayStringAtLine(2, (uint8_t *)"SENSORS");
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(3, msg);
         break;
     case 2: // sensors
         BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
@@ -70,7 +77,19 @@ void lcd_main_menu(uint8_t choice)
         BSP_LCD_DisplayStringAtLine(1, (uint8_t *)"MOVEMENT");
         BSP_LCD_SetTextColor(LCD_COLOR_RED);
         BSP_LCD_DisplayStringAtLine(2, (uint8_t *)"SENSORS");
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(3, msg);
         break;
+    case 3: // can ID
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(0, (uint8_t *)"PARAMETERS");
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(1, (uint8_t *)"MOVEMENT");
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(2, (uint8_t *)"SENSORS");
+        BSP_LCD_SetTextColor(LCD_COLOR_RED);
+        BSP_LCD_DisplayStringAtLine(3, msg);
+
     default:
         BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
         BSP_LCD_DisplayStringAtLine(0, (uint8_t *)"PARAMETERS");

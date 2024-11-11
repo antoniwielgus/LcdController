@@ -76,6 +76,8 @@ extern int32_t kp;
 extern int16_t kd;
 extern int16_t t;
 
+extern uint8_t can_id;
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

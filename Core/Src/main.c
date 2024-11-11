@@ -86,6 +86,12 @@ const int8_t KP_MIN = 0;
 const int16_t KD_MAX = 500;
 const int8_t KD_MIN = 0;
 
+// can ID
+uint8_t can_id = 0;
+
+const uint8_t CAN_ID_MAX = 12;
+const uint8_t CAN_ID_MIN = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -270,7 +276,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     // start motor
     if (actual_menu_type == PARAMETERS && menu_choice == 5)
     { 
-      set_can_ID(2);
+      set_can_ID(can_id);
       start_engin();
       send_buffer(&huart5);
     }
@@ -278,7 +284,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     // stop motor
     if (actual_menu_type == PARAMETERS && menu_choice == 6)
     {
-      set_can_ID(2);
+      set_can_ID(can_id);
       stop_engin();
       send_buffer(&huart5);
     }
@@ -377,6 +383,18 @@ void refresh_parameters()
     if (t < T_MIN)
       t = T_MIN;
   }
+
+  // for increasing or decreasing can id
+  if (actual_menu_type == MAIN && menu_choice == 3)
+  {
+    can_id += counter_different * addition_flag;
+
+    if (can_id > CAN_ID_MAX)
+      can_id = CAN_ID_MAX;
+  }
+
+  if (counter_different != 0)
+    lcd_refresh_UJ(actual_menu_type, menu_choice);
 
   encoder_previous_count = count;
 }
