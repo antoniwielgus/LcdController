@@ -10,8 +10,9 @@
 
 #include "main.h"
 
-extern const uint8_t buffer_size;
-extern uint8_t sender_buffer[23];
+
+#define BUFFER_SIZE 23
+extern uint8_t sender_buffer[BUFFER_SIZE];
 
 union Float_to_uint8_array
 {
@@ -23,6 +24,8 @@ void set_can_ID(uint8_t can_ID);
 void send_buffer(UART_HandleTypeDef* uart);
 void start_engin();
 void stop_engin();
+
+void load_data();
 
 
 #endif

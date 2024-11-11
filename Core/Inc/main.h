@@ -70,11 +70,11 @@ void Error_Handler(void);
 /* USER CODE BEGIN Private defines */
 
 // global variables
-extern uint16_t p;
-extern uint16_t v;
-extern uint16_t kp;
-extern uint16_t kd;
-extern uint16_t t;
+extern int16_t p;
+extern int16_t v;
+extern int32_t kp;
+extern int16_t kd;
+extern int16_t t;
 
 /* USER CODE END Private defines */
 

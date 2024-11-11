@@ -34,6 +34,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* USER CODE END Includes */
 
@@ -55,7 +56,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t encoder_previous_count = 0;
+uint16_t encoder_previous_count = 0;
 
 char msg[64];   // debug usart1 message frame
 uint32_t count; // encoder counter
@@ -63,18 +64,27 @@ uint8_t menu_choice = 0;
 enum Main_menu_type actual_menu_type = MAIN;
 
 // parameters
-uint16_t p = 0;
-uint16_t v = 0;
-uint16_t kp = 0;
-uint16_t kd = 0;
-uint16_t t = 0;
+int16_t p = 0;
+int16_t v = 0;
+int32_t kp = 0;
+int16_t kd = 0;
+int16_t t = 0;
 
 // parameters constraints
-const uint16_t P_MAX = 1250;
-const uint16_t P_MIN = 0;
+const int16_t P_MAX = 1250;
+const int16_t P_MIN = -1250;
 
-const uint16_t V_MAX = 950;
-const uint16_t V_MIN = 0;
+const int16_t V_MAX = 4500;
+const int16_t V_MIN = -4500;
+
+const int16_t T_MAX = 1800;
+const int16_t T_MIN = -1800;
+
+const int32_t KP_MAX = 50000;
+const int8_t KP_MIN = 0;
+
+const int16_t KD_MAX = 500;
+const int8_t KD_MIN = 0;
 
 /* USER CODE END PV */
 
@@ -273,6 +283,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       send_buffer(&huart5);
     }
 
+    // send data
+    if (actual_menu_type == PARAMETERS && menu_choice == 7)
+    {
+      load_data();
+      send_buffer(&huart5);
+    }
+
     HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_13);
   }
 
@@ -288,9 +305,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void refresh_parameters()
 {
-  int8_t counter_different = count - encoder_previous_count;
+  int16_t counter_different = count - encoder_previous_count;
 
-  if (counter_different == 999 || counter_different == -999)
+  // when occures overload of encoder rotation counter 
+  if (abs(counter_different) > 50)
     counter_different = 1;
 
   int8_t addition_flag = 1;
@@ -307,6 +325,9 @@ void refresh_parameters()
 
     if (p > P_MAX)
       p = P_MAX;
+
+    if (p < P_MIN)
+      p = P_MIN;
   }
 
   // for V value
@@ -316,24 +337,45 @@ void refresh_parameters()
 
     if (v > V_MAX)
       v = V_MAX;
+    
+    if (v < V_MIN)
+      v = V_MIN;
   }
 
   // for Kp value
   if (actual_menu_type == PARAMETERS && menu_choice == 2)
   {
     kp += (10 * counter_different * addition_flag);
+
+    if (kp > KP_MAX)
+      kp = KP_MAX;
+
+    if (kp < KP_MIN)
+      kp = KP_MIN;
   }
 
   // for KD value
   if (actual_menu_type == PARAMETERS && menu_choice == 3)
   {
     kd += (10 * counter_different * addition_flag);
+
+    if (kd > KD_MAX)
+      kd = KD_MAX;
+
+    if (kd < KD_MIN)
+      kd = KD_MIN;
   }
 
   // for t value
   if (actual_menu_type == PARAMETERS && menu_choice == 4)
   {
     t += (10 * counter_different * addition_flag);
+
+    if (t > T_MAX)
+      t = T_MAX;
+
+    if (t < T_MIN)
+      t = T_MIN;
   }
 
   encoder_previous_count = count;

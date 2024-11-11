@@ -7,8 +7,7 @@
 #include "communication.h"
 
 
-const uint8_t buffer_size = 23;
-uint8_t sender_buffer[23] = {0};
+uint8_t sender_buffer[BUFFER_SIZE] = {0};
 
 
 void set_can_ID(uint8_t can_ID)
@@ -18,7 +17,7 @@ void set_can_ID(uint8_t can_ID)
 
 void send_buffer(UART_HandleTypeDef* uart)
 {
-    HAL_UART_Transmit(uart, sender_buffer, buffer_size, HAL_MAX_DELAY);
+    HAL_UART_Transmit(uart, sender_buffer, BUFFER_SIZE, HAL_MAX_DELAY);
 }
 
 void start_engin()
@@ -29,4 +28,34 @@ void start_engin()
 void stop_engin()
 {
     sender_buffer[1] = 0x00;
+}
+
+
+
+
+void load_data()
+{
+    union Float_to_uint8_array my_union;
+
+    uint8_t i = 2;
+
+    my_union.float_value = p/100.;
+    for (uint8_t c = 0; c < 4; c++)
+        sender_buffer[i++] = my_union.uint8_t_array[c];
+
+    my_union.float_value = v/100.;
+    for (uint8_t c = 0; c < 4; c++)
+        sender_buffer[i++] = my_union.uint8_t_array[c];
+
+    my_union.float_value = kp/100.;
+    for (uint8_t c = 0; c < 4; c++)
+        sender_buffer[i++] = my_union.uint8_t_array[c];
+
+    my_union.float_value = kd/100.;
+    for (uint8_t c = 0; c < 4; c++)
+        sender_buffer[i++] = my_union.uint8_t_array[c];
+
+    my_union.float_value = t/100.;
+    for (uint8_t c = 0; c < 4; c++)
+        sender_buffer[i++] = my_union.uint8_t_array[c];
 }

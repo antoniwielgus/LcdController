@@ -11,6 +11,7 @@
 #include "main.h"
 #include "stdio.h"
 #include "string.h"
+#include "stdlib.h"
 
 
 // const uint8_t buffer_size = 64;
@@ -32,7 +33,7 @@ void lcd_parameters_type(uint8_t choice);
 void lcd_movment_type(uint8_t choice);
 void lcd_sensors_type(uint8_t choice);
 
-void float_to_char_array(char* destination, uint16_t value);
+void float_to_char_array(char* destination, int32_t value);
 
 
 
