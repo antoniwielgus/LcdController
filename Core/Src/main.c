@@ -255,6 +255,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       else
         menu_choice++;
     }
+
+    if (actual_menu_type == MOVEMENT)
+    {
+      if (menu_choice > 2)
+        menu_choice = 0;
+      else
+        menu_choice++;
+    }
   }
 
   if (GPIO_Pin == confirm_button_Pin && (currentTime - previousTime > 100))
@@ -267,7 +275,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       menu_choice = 0;
     }
 
+    // for back button (returning to MIAN menu)
     if (actual_menu_type == PARAMETERS && menu_choice == 8)
+    {
+      actual_menu_type = MAIN;
+      menu_choice = 0;
+    }
+
+    if (actual_menu_type == MOVEMENT && menu_choice == 2)
     {
       actual_menu_type = MAIN;
       menu_choice = 0;

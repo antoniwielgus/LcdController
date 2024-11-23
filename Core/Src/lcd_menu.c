@@ -29,7 +29,7 @@ void lcd_refresh_UJ(enum Main_menu_type actual, uint8_t choice)
         break;
 
     case MOVEMENT:
-        // lcd_movment_type(choice);
+        lcd_movment_type(choice);
         break;
 
     case SENSORS:
@@ -190,6 +190,48 @@ void lcd_parameters_type(uint8_t choice)
 
     BSP_LCD_SetTextColor(color8);
     BSP_LCD_DisplayStringAtLine(9, (uint8_t *)"BACK");
+}
+
+void lcd_movment_type(uint8_t choice)
+{
+    BSP_LCD_Clear(LCD_COLOR_WHITE);
+
+    BSP_LCD_SetTextColor(LCD_COLOR_GREEN);
+    BSP_LCD_DisplayStringAtLine(0, (uint8_t *)"__MOVEMENT__");
+
+    uint32_t color0 = LCD_COLOR_BLACK;
+    uint32_t color1 = LCD_COLOR_BLACK;
+    uint32_t color2 = LCD_COLOR_BLACK;
+
+    switch (choice)
+    {
+    case 0:
+        color0 = LCD_COLOR_RED;
+        break;
+    case 1:
+        color1 = LCD_COLOR_RED;
+        break;
+    case 2:
+        color2 = LCD_COLOR_RED;
+        break;
+    default:
+        break;
+    }
+
+    BSP_LCD_SetTextColor(color0);
+    // float_to_char_array(float_char, p);
+    // sprintf(message, "P: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(1, "Angle: ");
+
+    BSP_LCD_SetTextColor(color1);
+    // float_to_char_array(float_char, v);
+    // sprintf(message, "V: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(2, "Velocity: ");
+
+    BSP_LCD_SetTextColor(color2);
+    // float_to_char_array(float_char, kp);
+    // sprintf(message, "Kp: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(3, "Back");
 }
 
 void float_to_char_array(char *destination, int32_t value)
