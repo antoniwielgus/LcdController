@@ -33,7 +33,7 @@ void stop_engin()
 
 
 
-void load_data()
+void load_data(float p_, float v_, float kp_, float kd_, float t_)
 {
     union Float_to_uint8_array my_union;
 
@@ -42,23 +42,23 @@ void load_data()
 
     uint8_t i = 2;
 
-    my_union.float_value = p/100.;
+    my_union.float_value = p_;
     for (uint8_t c = 0; c < 4; c++)
         sender_buffer[i++] = my_union.uint8_t_array[c];
 
-    my_union.float_value = v/100.;
+    my_union.float_value = v_;
     for (uint8_t c = 0; c < 4; c++)
         sender_buffer[i++] = my_union.uint8_t_array[c];
 
-    my_union.float_value = kp/100.;
+    my_union.float_value = kp_;
     for (uint8_t c = 0; c < 4; c++)
         sender_buffer[i++] = my_union.uint8_t_array[c];
 
-    my_union.float_value = kd/100.;
+    my_union.float_value = kd_;
     for (uint8_t c = 0; c < 4; c++)
         sender_buffer[i++] = my_union.uint8_t_array[c];
 
-    my_union.float_value = t/100.;
+    my_union.float_value = t_;
     for (uint8_t c = 0; c < 4; c++)
         sender_buffer[i++] = my_union.uint8_t_array[c];
 }

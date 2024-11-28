@@ -70,6 +70,12 @@ int32_t kp = 0;
 int16_t kd = 0;
 int16_t t = 0;
 
+int16_t angle = 0;
+
+// constants
+const float Kp_const = 18.0;
+const float Kd_const = 2.0;
+
 // parameters constraints
 const int16_t P_MAX = 1250;
 const int16_t P_MIN = -1250;
@@ -109,9 +115,9 @@ void refresh_parameters();
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
 
@@ -175,22 +181,22 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -205,16 +211,15 @@ void SystemClock_Config(void)
   }
 
   /** Activate the Over-Drive mode
-  */
+   */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -290,7 +295,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
     // start motor
     if (actual_menu_type == PARAMETERS && menu_choice == 5)
-    { 
+    {
       set_can_ID(can_id);
       start_engin();
       send_buffer(&huart5);
@@ -307,7 +312,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     // send data
     if (actual_menu_type == PARAMETERS && menu_choice == 7)
     {
-      load_data();
+      load_data(p / 100., v / 100., kp / 100., kd / 100., t / 100.);
       send_buffer(&huart5);
     }
 
@@ -316,6 +321,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
   if (GPIO_Pin == encoder_interrupt_Pin)
   {
+    if (actual_menu_type == MOVEMENT && menu_choice == 0)
+    {
+      load_data(angle / 100., 0.0, Kp_const, Kd_const, 0.0);
+      send_buffer(&huart5);
+    }
+
     // useful to debug
     // sprintf((char *)msg, "Encoder: %d, Different: %d, P: %d, V: %d, flag: %d\n\r", count, counter_different, p, v, addition_flag);
     // HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 1000);
@@ -328,7 +339,7 @@ void refresh_parameters()
 {
   int16_t counter_different = count - encoder_previous_count;
 
-  // when occures overload of encoder rotation counter 
+  // when occures overload of encoder rotation counter
   if (abs(counter_different) > 50)
     counter_different = 1;
 
@@ -337,6 +348,18 @@ void refresh_parameters()
   {
     addition_flag = -1;
     counter_different *= -1;
+  }
+
+  // angle
+  if (actual_menu_type == MOVEMENT && menu_choice == 0)
+  {
+    angle += (10 * counter_different * addition_flag);
+
+    if (angle > 1000)
+      angle = 1000;
+
+    if (angle < -1000)
+      angle = -1000;
   }
 
   // for P value
@@ -358,7 +381,7 @@ void refresh_parameters()
 
     if (v > V_MAX)
       v = V_MAX;
-    
+
     if (v < V_MIN)
       v = V_MIN;
   }
@@ -417,9 +440,9 @@ void refresh_parameters()
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -431,14 +454,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

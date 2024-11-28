@@ -25,7 +25,7 @@ void send_buffer(UART_HandleTypeDef* uart);
 void start_engin();
 void stop_engin();
 
-void load_data();
+void load_data(float p_, float v_, float kp_, float kd_, float t_);
 
 
 #endif

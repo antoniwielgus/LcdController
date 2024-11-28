@@ -203,6 +203,9 @@ void lcd_movment_type(uint8_t choice)
     uint32_t color1 = LCD_COLOR_BLACK;
     uint32_t color2 = LCD_COLOR_BLACK;
 
+    char message[64];
+    char float_char[7];
+
     switch (choice)
     {
     case 0:
@@ -218,10 +221,15 @@ void lcd_movment_type(uint8_t choice)
         break;
     }
 
-    BSP_LCD_SetTextColor(color0);
+    // BSP_LCD_SetTextColor(color0);
     // float_to_char_array(float_char, p);
     // sprintf(message, "P: %s", float_char);
-    BSP_LCD_DisplayStringAtLine(1, "Angle: ");
+    // BSP_LCD_DisplayStringAtLine(1, message);
+
+    BSP_LCD_SetTextColor(color0);
+    float_to_char_array(float_char, angle);
+    sprintf(message, "Angle: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(1, message);
 
     BSP_LCD_SetTextColor(color1);
     // float_to_char_array(float_char, v);
