@@ -59,7 +59,7 @@
 uint16_t encoder_previous_count = 0;
 
 char msg[64];   // debug usart1 message frame
-uint32_t count; // encoder counter
+uint16_t count; // encoder counter
 uint8_t menu_choice = 0;
 enum Main_menu_type actual_menu_type = MAIN;
 
@@ -79,6 +79,9 @@ const float Kd_const = 2.0;
 // parameters constraints
 const int16_t P_MAX = 1250;
 const int16_t P_MIN = -1250;
+
+const int16_t angle_MAX = 1000;
+const int16_t angle_MIN = -1000;
 
 const int16_t V_MAX = 4500;
 const int16_t V_MIN = -4500;
@@ -340,32 +343,34 @@ void refresh_parameters()
   int16_t counter_different = count - encoder_previous_count;
 
   // when occures overload of encoder rotation counter
-  if (abs(counter_different) > 50)
+  if (abs(counter_different) > 1900)
     counter_different = 1;
 
-  int8_t addition_flag = 1;
-  if (counter_different < 0)
-  {
-    addition_flag = -1;
-    counter_different *= -1;
-  }
+  // int8_t addition_flag = 1;
+  // if (counter_different < 0)
+  // {
+  //   addition_flag = -1;
+  //   counter_different *= -1;
+  // }
 
   // angle
   if (actual_menu_type == MOVEMENT && menu_choice == 0)
   {
-    angle += (10 * counter_different * addition_flag);
+    // angle += (10 * counter_different * addition_flag);
+    angle += (10 * counter_different);
 
-    if (angle > 1000)
+    if (angle > angle_MAX)
       angle = 1000;
 
-    if (angle < -1000)
+    if (angle < angle_MIN)
       angle = -1000;
   }
 
   // for P value
   if (actual_menu_type == PARAMETERS && menu_choice == 0)
   {
-    p += (10 * counter_different * addition_flag);
+    // p += (10 * counter_different * addition_flag);
+    p += (10 * counter_different);
 
     if (p > P_MAX)
       p = P_MAX;
@@ -377,7 +382,8 @@ void refresh_parameters()
   // for V value
   if (actual_menu_type == PARAMETERS && menu_choice == 1)
   {
-    v += (10 * counter_different * addition_flag);
+    // v += (10 * counter_different * addition_flag);
+    v += (10 * counter_different);
 
     if (v > V_MAX)
       v = V_MAX;
@@ -389,7 +395,8 @@ void refresh_parameters()
   // for Kp value
   if (actual_menu_type == PARAMETERS && menu_choice == 2)
   {
-    kp += (10 * counter_different * addition_flag);
+    // kp += (10 * counter_different * addition_flag);
+    kp += (10 * counter_different);
 
     if (kp > KP_MAX)
       kp = KP_MAX;
@@ -401,7 +408,8 @@ void refresh_parameters()
   // for KD value
   if (actual_menu_type == PARAMETERS && menu_choice == 3)
   {
-    kd += (10 * counter_different * addition_flag);
+    // kd += (10 * counter_different * addition_flag);
+    kd += (10 * counter_different);
 
     if (kd > KD_MAX)
       kd = KD_MAX;
@@ -413,7 +421,8 @@ void refresh_parameters()
   // for t value
   if (actual_menu_type == PARAMETERS && menu_choice == 4)
   {
-    t += (10 * counter_different * addition_flag);
+    // t += (10 * counter_different * addition_flag);
+    t += (10 * counter_different);
 
     if (t > T_MAX)
       t = T_MAX;
@@ -425,7 +434,8 @@ void refresh_parameters()
   // for increasing or decreasing can id
   if (actual_menu_type == MAIN && menu_choice == 3)
   {
-    can_id += counter_different * addition_flag;
+    // can_id += counter_different * addition_flag;
+    can_id += counter_different;
 
     if (can_id > CAN_ID_MAX)
       can_id = CAN_ID_MAX;
