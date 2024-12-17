@@ -77,6 +77,7 @@ extern int16_t kd;
 extern int16_t t;
 
 extern int16_t angle;
+extern int16_t velocity;
 
 extern uint8_t can_id;
 

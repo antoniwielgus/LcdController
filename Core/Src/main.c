@@ -71,6 +71,7 @@ int16_t kd = 0;
 int16_t t = 0;
 
 int16_t angle = 0;
+int16_t velocity = 0;
 
 // constants
 const float Kp_const = 18.0;
@@ -82,6 +83,9 @@ const int16_t P_MIN = -1250;
 
 const int16_t angle_MAX = 1000;
 const int16_t angle_MIN = -1000;
+
+const uint16_t velocity_MAX = 1500;
+const uint16_t velocity_MIN = 0;
 
 const int16_t V_MAX = 4500;
 const int16_t V_MIN = -4500;
@@ -324,9 +328,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
   if (GPIO_Pin == encoder_interrupt_Pin)
   {
+    // Angle controle mode
     if (actual_menu_type == MOVEMENT && menu_choice == 0)
     {
       load_data(angle / 100., 0.0, Kp_const, Kd_const, 0.0);
+      send_buffer(&huart5);
+    }
+
+    // Velocity controle mode
+    if (actual_menu_type == MOVEMENT && menu_choice == 1)
+    {
+      load_data(0., velocity / 100., 0., 4.7, 0.);
       send_buffer(&huart5);
     }
 
@@ -364,6 +376,18 @@ void refresh_parameters()
 
     if (angle < angle_MIN)
       angle = -1000;
+  }
+
+  // velocity
+  if (actual_menu_type == MOVEMENT && menu_choice == 1)
+  {
+    velocity += (10 * counter_different);
+
+    if (velocity > velocity_MAX)
+      velocity = velocity_MAX;
+
+    if (velocity < velocity_MIN)
+      velocity = velocity_MIN;
   }
 
   // for P value

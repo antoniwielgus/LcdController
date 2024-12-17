@@ -232,9 +232,9 @@ void lcd_movment_type(uint8_t choice)
     BSP_LCD_DisplayStringAtLine(1, message);
 
     BSP_LCD_SetTextColor(color1);
-    // float_to_char_array(float_char, v);
-    // sprintf(message, "V: %s", float_char);
-    BSP_LCD_DisplayStringAtLine(2, "Velocity: ");
+    float_to_char_array(float_char, velocity);
+    sprintf(message, "Velocity: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(2, message);
 
     BSP_LCD_SetTextColor(color2);
     // float_to_char_array(float_char, kp);
