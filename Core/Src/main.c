@@ -105,6 +105,13 @@ uint8_t can_id = 0;
 const uint8_t CAN_ID_MAX = 12;
 const uint8_t CAN_ID_MIN = 0;
 
+// reading motor parameters
+volatile uint8_t id_sensor;
+volatile float p_sensor;
+volatile float v_sensor;
+volatile float i_sensor;
+volatile uint8_t T_sensor;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -119,12 +126,13 @@ void SystemClock_Config(void);
 // this function is used to refresh p, v, Kp, Kd, t parameters
 void refresh_parameters();
 
+
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
 
@@ -170,6 +178,9 @@ int main(void)
   HAL_Delay(1000);
   // lcd_main_menu(actual_menu_type);
 
+  // activate interrupt for uart receiveing data
+  HAL_UART_Receive_IT(&huart5, receiveing_buffer, RECEIVEING_BUFFER_SIZE);
+
   while (1)
   {
     count = __HAL_TIM_GET_COUNTER(&htim3);
@@ -188,22 +199,22 @@ int main(void)
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
+  * in the RCC_OscInitTypeDef structure.
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -218,15 +229,16 @@ void SystemClock_Config(void)
   }
 
   /** Activate the Over-Drive mode
-   */
+  */
   if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -275,6 +287,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
       else
         menu_choice++;
     }
+
+    if (actual_menu_type == SENSORS)
+    {
+      if (menu_choice > 1)
+        menu_choice = 0;
+      else
+        menu_choice++;
+    }
   }
 
   if (GPIO_Pin == confirm_button_Pin && (currentTime - previousTime > 100))
@@ -295,6 +315,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     }
 
     if (actual_menu_type == MOVEMENT && menu_choice == 2)
+    {
+      actual_menu_type = MAIN;
+      menu_choice = 0;
+    }
+
+    if (actual_menu_type == SENSORS && menu_choice == 1)
     {
       actual_menu_type = MAIN;
       menu_choice = 0;
@@ -471,12 +497,23 @@ void refresh_parameters()
   encoder_previous_count = count;
 }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == UART5)
+  {
+    receive_uart_buffer(receiveing_buffer, &id_sensor, &p_sensor, &v_sensor, &i_sensor, &T_sensor);
+
+    // HAL_UART_Transmit(&huart1, "Hello\n\r", 8, HAL_MAX_DELAY);
+    HAL_UART_Receive_IT(&huart5, receiveing_buffer, RECEIVEING_BUFFER_SIZE);
+  }
+}
+
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -488,14 +525,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

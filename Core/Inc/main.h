@@ -81,6 +81,13 @@ extern int16_t velocity;
 
 extern uint8_t can_id;
 
+// reading motor parameters
+extern volatile uint8_t id_sensor;
+extern volatile float p_sensor;
+extern volatile float v_sensor;
+extern volatile float i_sensor;
+extern volatile uint8_t T_sensor;
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

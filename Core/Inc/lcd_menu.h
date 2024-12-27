@@ -33,7 +33,8 @@ void lcd_parameters_type(uint8_t choice);
 void lcd_movment_type(uint8_t choice);
 void lcd_sensors_type(uint8_t choice);
 
-void float_to_char_array(char* destination, int32_t value);
+void int32_t_to_char_array(char* destination, int32_t value);
+void float_to_char_array_(char* destination, float value);
 
 
 

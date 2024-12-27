@@ -8,6 +8,8 @@
 
 #include "stm32f429i_discovery_lcd.h"
 
+#include "usart.h"
+
 void lcd_initialization()
 {
     BSP_LCD_Init();
@@ -33,7 +35,7 @@ void lcd_refresh_UJ(enum Main_menu_type actual, uint8_t choice)
         break;
 
     case SENSORS:
-        // lcd_sensors_type(choice);
+        lcd_sensors_type(choice);
         break;
 
     default:
@@ -155,27 +157,27 @@ void lcd_parameters_type(uint8_t choice)
     char float_char[7];
 
     BSP_LCD_SetTextColor(color0);
-    float_to_char_array(float_char, p);
+    int32_t_to_char_array(float_char, p);
     sprintf(message, "P: %s", float_char);
     BSP_LCD_DisplayStringAtLine(1, message);
 
     BSP_LCD_SetTextColor(color1);
-    float_to_char_array(float_char, v);
+    int32_t_to_char_array(float_char, v);
     sprintf(message, "V: %s", float_char);
     BSP_LCD_DisplayStringAtLine(2, message);
 
     BSP_LCD_SetTextColor(color2);
-    float_to_char_array(float_char, kp);
+    int32_t_to_char_array(float_char, kp);
     sprintf(message, "Kp: %s", float_char);
     BSP_LCD_DisplayStringAtLine(3, message);
 
     BSP_LCD_SetTextColor(color3);
-    float_to_char_array(float_char, kd);
+    int32_t_to_char_array(float_char, kd);
     sprintf(message, "Kd: %s", float_char);
     BSP_LCD_DisplayStringAtLine(4, message);
 
     BSP_LCD_SetTextColor(color4);
-    float_to_char_array(float_char, t);
+    int32_t_to_char_array(float_char, t);
     sprintf(message, "T: %s", float_char);
     BSP_LCD_DisplayStringAtLine(5, message);
 
@@ -222,27 +224,72 @@ void lcd_movment_type(uint8_t choice)
     }
 
     // BSP_LCD_SetTextColor(color0);
-    // float_to_char_array(float_char, p);
+    // int32_t_to_char_array(float_char, p);
     // sprintf(message, "P: %s", float_char);
     // BSP_LCD_DisplayStringAtLine(1, message);
 
     BSP_LCD_SetTextColor(color0);
-    float_to_char_array(float_char, angle);
+    int32_t_to_char_array(float_char, angle);
     sprintf(message, "Angle: %s", float_char);
     BSP_LCD_DisplayStringAtLine(1, message);
 
     BSP_LCD_SetTextColor(color1);
-    float_to_char_array(float_char, velocity);
+    int32_t_to_char_array(float_char, velocity);
     sprintf(message, "Velocity: %s", float_char);
     BSP_LCD_DisplayStringAtLine(2, message);
 
     BSP_LCD_SetTextColor(color2);
-    // float_to_char_array(float_char, kp);
+    // int32_t_to_char_array(float_char, kp);
     // sprintf(message, "Kp: %s", float_char);
     BSP_LCD_DisplayStringAtLine(3, "Back");
 }
 
-void float_to_char_array(char *destination, int32_t value)
+void lcd_sensors_type(uint8_t choice)
+{
+    char message[64];
+    char float_char[7];
+
+    for (uint8_t i = 0; i < 64; i++)
+    {
+        if (i < 7)
+            float_char[i] = ' ';
+        message[i] = ' ';
+    }
+
+    BSP_LCD_Clear(LCD_COLOR_WHITE);
+    BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+    
+    sprintf(message, "Id: %d", id_sensor);
+    BSP_LCD_DisplayStringAtLine(0, message);
+    
+    float_to_char_array_(float_char, p_sensor);
+    sprintf(message, "P: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(1, message);
+
+    float_to_char_array_(float_char, v_sensor);
+    sprintf(message, "V: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(2, message);
+
+    float_to_char_array_(float_char, i_sensor);
+    sprintf(message, "I: %s", float_char);
+    BSP_LCD_DisplayStringAtLine(3, message);
+
+    sprintf(message, "T: %d", T_sensor);
+    BSP_LCD_DisplayStringAtLine(4, message);
+
+    if (choice == 1)
+    {
+        BSP_LCD_SetTextColor(LCD_COLOR_RED);
+        BSP_LCD_DisplayStringAtLine(5, "Back");
+    }
+    else
+    {
+        BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+        BSP_LCD_DisplayStringAtLine(5, "Back");
+    }
+}
+
+void int32_t_to_char_array(char *destination, int32_t value)
 {
     char val[7];
 
@@ -251,6 +298,7 @@ void float_to_char_array(char *destination, int32_t value)
     
     for (uint8_t i = 0; i < 6; i++)
         destination[i] = ' ';
+
 
     if (value >= 0 && value < 100)
         sprintf(destination, "0,%c%c%c%c%c", val[0], val[1], val[2], val[3], val[4]);
@@ -268,4 +316,28 @@ void float_to_char_array(char *destination, int32_t value)
         sprintf(destination, "-%c%c,%c%c%c", val[0], val[1], val[2], val[3], val[4]);
     else if (value > -100000 && value <= -10000)
         sprintf(destination, "-%c%c%c,%c%c", val[0], val[1], val[2], val[3], val[4]);
+}
+
+void float_to_char_array_(char* destination, float value)
+{
+    for (uint8_t i = 0; i < 6; i++)
+        destination[i] = ' ';
+
+    int16_t val_int = (int16_t)value;
+    int16_t val_float = (int16_t)(value * 100000) - val_int;
+
+    if (val_float < 10000 && val_float > 1000)
+        sprintf(destination, "%d,0%d", val_int, val_float);
+    else if (val_float < 1000 && val_float > 100)
+        sprintf(destination, "%d,00%d", val_int, val_float);
+    else if (val_float < 100 && val_float > 10)
+        sprintf(destination, "%d,000%d", val_int, val_float);
+    else if (val_float < 10 && val_float > 1)
+        sprintf(destination, "%d,0000%d", val_int, val_float);
+    else if (val_float < 1)
+        sprintf(destination, "%d,00000%d", val_int, val_float);
+    else
+        sprintf(destination, "%d,%d", val_int, val_float);
+
+    HAL_UART_Transmit(&huart1, destination, 8, HAL_MAX_DELAY);
 }
