@@ -106,11 +106,11 @@ const uint8_t CAN_ID_MAX = 12;
 const uint8_t CAN_ID_MIN = 0;
 
 // reading motor parameters
-volatile uint8_t id_sensor;
+volatile uint8_t id_sensor = 0;
 volatile float p_sensor;
 volatile float v_sensor;
 volatile float i_sensor;
-volatile uint8_t T_sensor;
+volatile uint8_t T_sensor = 0;
 
 /* USER CODE END PV */
 

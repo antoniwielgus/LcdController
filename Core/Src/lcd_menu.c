@@ -246,15 +246,18 @@ void lcd_movment_type(uint8_t choice)
 
 void lcd_sensors_type(uint8_t choice)
 {
-    char message[64];
+    char message[15];
     char float_char[7];
 
-    for (uint8_t i = 0; i < 64; i++)
+    for (uint8_t i = 0; i < 15; i++)
     {
         if (i < 7)
             float_char[i] = ' ';
+
         message[i] = ' ';
     }
+
+    message[14] = '\00';
 
     BSP_LCD_Clear(LCD_COLOR_WHITE);
     BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
@@ -262,15 +265,15 @@ void lcd_sensors_type(uint8_t choice)
     sprintf(message, "Id: %d", id_sensor);
     BSP_LCD_DisplayStringAtLine(0, message);
     
-    float_to_char_array_(float_char, p_sensor);
+    float_to_char_array(float_char, p_sensor);
     sprintf(message, "P: %s", float_char);
     BSP_LCD_DisplayStringAtLine(1, message);
 
-    float_to_char_array_(float_char, v_sensor);
+    float_to_char_array(float_char, v_sensor);
     sprintf(message, "V: %s", float_char);
     BSP_LCD_DisplayStringAtLine(2, message);
 
-    float_to_char_array_(float_char, i_sensor);
+    float_to_char_array(float_char, i_sensor);
     sprintf(message, "I: %s", float_char);
     BSP_LCD_DisplayStringAtLine(3, message);
 
@@ -318,26 +321,26 @@ void int32_t_to_char_array(char *destination, int32_t value)
         sprintf(destination, "-%c%c%c,%c%c", val[0], val[1], val[2], val[3], val[4]);
 }
 
-void float_to_char_array_(char* destination, float value)
+void float_to_char_array(char* destination, float value)
 {
     for (uint8_t i = 0; i < 6; i++)
         destination[i] = ' ';
 
-    int16_t val_int = (int16_t)value;
-    int16_t val_float = (int16_t)(value * 100000) - val_int;
+    int16_t integer_part = (int16_t)value;
+    int16_t fractional_part = (int16_t)(value * 100000) - integer_part;
 
-    if (val_float < 10000 && val_float > 1000)
-        sprintf(destination, "%d,0%d", val_int, val_float);
-    else if (val_float < 1000 && val_float > 100)
-        sprintf(destination, "%d,00%d", val_int, val_float);
-    else if (val_float < 100 && val_float > 10)
-        sprintf(destination, "%d,000%d", val_int, val_float);
-    else if (val_float < 10 && val_float > 1)
-        sprintf(destination, "%d,0000%d", val_int, val_float);
-    else if (val_float < 1)
-        sprintf(destination, "%d,00000%d", val_int, val_float);
+    if (fractional_part < 10000 && fractional_part > 1000)
+        sprintf(destination, "%d,0%d", integer_part, fractional_part);
+    else if (fractional_part < 1000 && fractional_part > 100)
+        sprintf(destination, "%d,00%d", integer_part, fractional_part);
+    else if (fractional_part < 100 && fractional_part > 10)
+        sprintf(destination, "%d,000%d", integer_part, fractional_part);
+    else if (fractional_part < 10 && fractional_part > 1)
+        sprintf(destination, "%d,0000%d", integer_part, fractional_part);
+    else if (fractional_part < 1)
+        sprintf(destination, "%d,00000%d", integer_part, fractional_part);
     else
-        sprintf(destination, "%d,%d", val_int, val_float);
+        sprintf(destination, "%d,%d", integer_part, fractional_part);
 
-    HAL_UART_Transmit(&huart1, destination, 8, HAL_MAX_DELAY);
+    destination[6] = '\00';
 }
