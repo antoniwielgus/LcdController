@@ -35,7 +35,7 @@ void stop_engin();
 void load_data(float p_, float v_, float kp_, float kd_, float t_);
 
 float uint_to_float(int x_int, float x_min, float x_max, int bits);
-void receive_uart_buffer(uint8_t *data, uint8_t* id_, float* p_, float* v_, float* i_, uint8_t* T_);
+void parse_uart_buffer(uint8_t *data, uint8_t* id_, float* p_, float* v_, float* i_, uint8_t* T_);
 
 
 #endif

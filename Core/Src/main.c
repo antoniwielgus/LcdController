@@ -501,9 +501,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart->Instance == UART5)
   {
-    receive_uart_buffer(receiveing_buffer, &id_sensor, &p_sensor, &v_sensor, &i_sensor, &T_sensor);
+    parse_uart_buffer(receiveing_buffer, &id_sensor, &p_sensor, &v_sensor, &i_sensor, &T_sensor);
 
-    // HAL_UART_Transmit(&huart1, "Hello\n\r", 8, HAL_MAX_DELAY);
     HAL_UART_Receive_IT(&huart5, receiveing_buffer, RECEIVEING_BUFFER_SIZE);
   }
 }
