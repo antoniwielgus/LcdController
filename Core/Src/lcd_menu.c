@@ -267,6 +267,7 @@ void lcd_sensors_type(uint8_t choice)
     
     float_to_char_array(float_char, p_sensor);
     sprintf(message, "P: %s", float_char);
+    HAL_UART_Transmit(&huart1, message, 16, HAL_MAX_DELAY);
     BSP_LCD_DisplayStringAtLine(1, message);
 
     float_to_char_array(float_char, v_sensor);
@@ -326,8 +327,11 @@ void float_to_char_array(char* destination, float value)
     for (uint8_t i = 0; i < 6; i++)
         destination[i] = ' ';
 
+    // int16_t integer_part = (int16_t)value;
+    // int16_t fractional_part = (int16_t)(value * 100000) - integer_part;
+
     int16_t integer_part = (int16_t)value;
-    int16_t fractional_part = (int16_t)(value * 100000) - integer_part;
+    int16_t fractional_part = (int16_t)((value - (int16_t)integer_part) * 100000);
 
     if (fractional_part < 10000 && fractional_part > 1000)
         sprintf(destination, "%d,0%d", integer_part, fractional_part);

@@ -106,11 +106,11 @@ const uint8_t CAN_ID_MAX = 12;
 const uint8_t CAN_ID_MIN = 0;
 
 // reading motor parameters
-volatile uint8_t id_sensor = 0;
+volatile uint8_t id_sensor;
 volatile float p_sensor;
 volatile float v_sensor;
 volatile float i_sensor;
-volatile uint8_t T_sensor = 0;
+volatile uint8_t T_sensor;
 
 /* USER CODE END PV */
 
@@ -378,6 +378,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void refresh_parameters()
 {
+  set_can_ID(can_id);
+
   int16_t counter_different = count - encoder_previous_count;
 
   // when occures overload of encoder rotation counter
